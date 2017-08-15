@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour {
 	private string minutes;
 	private string seconds;
 
+	bool onGround = true; //variable for checking if on ground
+	bool canDoubleJump = false; //can only double jump when NOT on ground
+
 	void Start () //beginning of game
 	{
 		startTime = Time.time; //begin timer
@@ -35,6 +38,39 @@ public class PlayerController : MonoBehaviour {
 		seconds = (t % 60).ToString ("f2"); //f2 part decides only 2 decimal places. write f0 for no decimals
 
 		timerText.text = minutes + ":" + seconds;
+
+		RaycastHit hit; //projects a vector down from the center of the ball to see if the player is on the ground
+		Vector3 physicsCentre = this.transform.position + this.GetComponent<SphereCollider>().center;
+
+		Debug.DrawRay (physicsCentre, Vector3.down, Color.red, 1); //sets boolean variable onGround to true or false depending on if ray is touching ground
+																	//debug is to be able to see the line
+		if (Physics.Raycast (physicsCentre, Vector3.down, out hit, 1)) 
+		{
+			if (hit.transform.gameObject.tag != "Player") 
+			{
+				onGround = true;
+			}
+		} 
+		else 
+		{
+			onGround = false;
+		}
+
+		Debug.Log (onGround);
+
+		if (Input.GetKeyDown ("space") && !onGround && canDoubleJump) //if user is NOT on ground
+		{
+			Vector3 newVelocity = GetComponent<Rigidbody> ().velocity; //setting ONLY vertical velocity to zero for double jump
+			newVelocity.y = 0;
+			GetComponent<Rigidbody> ().velocity = newVelocity;
+			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 400);
+			canDoubleJump = false;
+		}
+		if (Input.GetKeyDown ("space") && onGround) //if user presses space AND player is touching ground then ball will jump
+		{
+			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 400);
+			canDoubleJump = true;
+		}
 	}
 
 	void FixedUpdate() ///Called before physics calcs (physics code)
@@ -42,7 +78,7 @@ public class PlayerController : MonoBehaviour {
 		float moveHorizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
 		
-		Vector3 movement = new Vector3 (moveHorizontal, 0.0f, moveVertical); ///get float values into a vector 3 value
+		Vector3 movement = new Vector3 (moveHorizontal*2, 0.0f, moveVertical*2); ///get float values into a vector 3 value
 			///xyz values determine direction of force we add to ball
 			/// 0.0f as y value because we aren't moving the object vertically
 	
