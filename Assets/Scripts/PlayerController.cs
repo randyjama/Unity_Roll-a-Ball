@@ -20,6 +20,9 @@ public class PlayerController : MonoBehaviour {
 	bool onGround = true; //variable for checking if on ground
 	bool canDoubleJump = false; //can only double jump when NOT on ground
 
+	public float maxSpeed = 10; //variables related to max movement speed
+	public float horizontalMovement;
+
 	void Start () //beginning of game
 	{
 		startTime = Time.time; //begin timer
@@ -63,14 +66,22 @@ public class PlayerController : MonoBehaviour {
 			Vector3 newVelocity = GetComponent<Rigidbody> ().velocity; //setting ONLY vertical velocity to zero for double jump
 			newVelocity.y = 0;
 			GetComponent<Rigidbody> ().velocity = newVelocity;
-			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 400);
+			GetComponent<Rigidbody> ().angularVelocity = Vector3.zero;
+			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 500);
 			canDoubleJump = false;
 		}
 		if (Input.GetKeyDown ("space") && onGround) //if user presses space AND player is touching ground then ball will jump
 		{
-			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 400);
+			this.GetComponent<Rigidbody> ().AddForce (Vector3.up * 500);
 			canDoubleJump = true;
 		}
+
+		Vector2 horizontalMovement = new Vector2 (rb.velocity.x, rb.velocity.z); //code to set max movement speed
+		if (horizontalMovement.magnitude > maxSpeed)
+		{
+			horizontalMovement = horizontalMovement.normalized * maxSpeed;
+		}
+		rb.velocity = new Vector3 (horizontalMovement.x, rb.velocity.y, horizontalMovement.y);
 	}
 
 	void FixedUpdate() ///Called before physics calcs (physics code)
