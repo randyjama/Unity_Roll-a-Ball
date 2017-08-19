@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour {
 
 	private Rigidbody rb; ///create variable to hold the reference
 	private int count; //player score
+	public int countMax;
 
 	public Text timerText;
 	private float startTime;
@@ -46,7 +47,7 @@ public class PlayerController : MonoBehaviour {
 		Vector3 physicsCentre = this.transform.position + this.GetComponent<SphereCollider>().center;
 
 		Debug.DrawRay (physicsCentre, Vector3.down, Color.red, 1); //sets boolean variable onGround to true or false depending on if ray is touching ground
-																	//debug is to be able to see the line
+		//debug is to be able to see the line
 		if (Physics.Raycast (physicsCentre, Vector3.down, out hit, 1)) 
 		{
 			if (hit.transform.gameObject.tag != "Player") 
@@ -88,11 +89,11 @@ public class PlayerController : MonoBehaviour {
 	{
 		float moveHorizontal = Input.GetAxis ("Horizontal");
 		float moveVertical = Input.GetAxis ("Vertical");
-		
+
 		Vector3 movement = new Vector3 (moveHorizontal*2, 0.0f, moveVertical*2); ///get float values into a vector 3 value
-			///xyz values determine direction of force we add to ball
-			/// 0.0f as y value because we aren't moving the object vertically
-	
+		///xyz values determine direction of force we add to ball
+		/// 0.0f as y value because we aren't moving the object vertically
+
 		rb.AddForce (movement * speed); ///multiply movement by global var speed to make ball go faster
 
 	}
@@ -110,9 +111,9 @@ public class PlayerController : MonoBehaviour {
 	void SetCountText() //sets count value based on how many collectibles we got
 	{
 		countText.text = "Count: " + count.ToString ();
-		if (count >= 12)
+		if (count >= countMax)
 		{
-			winText.text = "Completed!";
+			winText.text = "Complete!";
 			Time.timeScale = 0; //completely stops time (and the entire game)
 		}
 	}
